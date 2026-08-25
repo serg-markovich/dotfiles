@@ -1,1 +1,17 @@
+aaron-bond.better-comments
+alefragnani.project-manager
+anthropic.claude-code
+bierner.markdown-mermaid
+eamodio.gitlens
+foam.foam-vscode
+gera2ld.markmap-vscode
+github.vscode-github-actions
+github.vscode-pull-request-github
+hashicorp.terraform
+kilocode.kilo-code
+ms-kubernetes-tools.vscode-kubernetes-tools
+ms-vscode-remote.remote-containers
 pucelle.run-on-save
+redhat.vscode-yaml
+vsls-contrib.gistfs
+yzhang.markdown-all-in-one

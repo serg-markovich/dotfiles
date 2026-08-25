@@ -1,0 +1,25 @@
+{
+    "files.autoSave": "afterDelay",
+    "claudeCode.preferredLocation": "panel",
+    "claudeCode.useTerminal": true,
+    "liveServer.settings.donotVerifyTags": true,
+    "yaml.disableSchemaDetection": [
+        "**/.github/workflows/*.yml",
+        "**/.github/workflows/*.yaml",
+        "**/.gitea/workflows/*.yml",
+        "**/.gitea/workflows/*.yaml",
+        "**/.forgejo/workflows/*.yml",
+        "**/.forgejo/workflows/*.yaml"
+    ],
+    "terminal.integrated.commandsToSkipShell": [
+        "kilo-code.new.agentManagerOpen",
+        "kilo-code.new.agentManager.showTerminal",
+        "kilo-code.new.agentManager.previousTerminal",
+        "kilo-code.new.agentManager.nextTerminal"
+    ],
+    "kilo-code.new.attention.enabled": true,
+    "kilo-code.new.language": "ru",
+    "kilo-code.new.languageCommitMessage": "en",
+    "security.workspace.trust.untrustedFiles": "open",
+    "workbench.editor.empty.hint": "hidden"
+}
