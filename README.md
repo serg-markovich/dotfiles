@@ -1,24 +1,38 @@
 # dotfiles
 
-Personal configuration files (Zsh, Git) managed with [chezmoi](https://www.chezmoi.io/).
-Secrets are kept out of version control entirely via a local `~/.secrets` file
-(never tracked, see `.chezmoiignore`) and loaded into the shell at runtime.
+Reproducible workstation configuration for Zsh, Git, and VS Code, managed with [chezmoi](https://www.chezmoi.io) and secured with [gitleaks](https://github.com/gitleaks/gitleaks) pre-commit scanning. Built with DevOps principles: one command to bootstrap, no manual setup steps, secrets never committed in plaintext.
 
-## What's inside
-
-- `dot_zshrc` — Zsh config, aliases, plugin setup (oh-my-zsh), OpenRouter routing for Claude Code
-- `dot_gitconfig` — Git identity, aliases, sane defaults
-- `dot_gitignore_global` — global ignore patterns, with a focus on never leaking secrets
-
-## Quick start on a new machine
+## Quick start (new machine)
 
 ```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- -b ~/.local/bin
-chezmoi init --apply serg-markovich
+sh -c "$(curl -fsLS https://raw.githubusercontent.com/serg-markovich/dotfiles/main/install.sh)"
 ```
 
-## Secrets
+This installs chezmoi, clones this repo, and applies every tracked config file to your `$HOME` in one step.
 
-Never committed. Create `~/.secrets` locally on any machine and export
-whatever API keys/tokens you need — it's sourced automatically from `dot_zshrc`
-and ignored by chezmoi via `.chezmoiignore`.
+## What's managed here
+
+- **Shell**: `.zshrc` — aliases, prompt, environment variables
+- **Git**: global `.gitconfig` and `.gitignore_global`
+- **VS Code**: `settings.json` and a full extensions list (`vscode-extensions.txt`), synced via chezmoi
+- **Secrets safety**: every commit is scanned locally by a gitleaks pre-commit hook before it reaches GitHub
+
+## Security model
+
+Secrets (SSH keys, tokens) are never stored in plaintext. Sensitive files are encrypted with [age](https://github.com/FiloSottile/age) via `chezmoi add --encrypt` before being committed — see `.chezmoi.toml.tmpl` for the encryption config *(in progress, see Roadmap)*.
+
+## Restore VS Code extensions on a new machine
+
+```bash
+xargs -n1 code --install-extension < vscode-extensions.txt
+```
+
+## Roadmap
+
+- [ ] Encrypt SSH config with age
+- [ ] Export and track apt/snap package manifest
+- [ ] Verify full reproducibility in a clean Docker container
+
+## Why this exists
+
+Part of my transition from web development to DevOps in Germany — this repo demonstrates infrastructure-as-code principles applied to a personal workstation: idempotent setup, encrypted secrets, automated verification, and zero manual configuration drift between machines.
