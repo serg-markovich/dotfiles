@@ -1,0 +1,49 @@
+name: Verify bootstrap reproducibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  bootstrap-clean-container:
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:24.04
+    steps:
+      - name: Install prerequisites
+        run: |
+          apt-get update
+          apt-get install -y curl ca-certificates git sudo
+
+      - name: Create non-root test user
+        run: |
+          useradd -m -s /bin/bash testuser
+
+      - name: Run bootstrap as testuser
+        run: |
+          su - testuser -c 'sh -c "$(curl -fsLS https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/install.sh)"' || true
+
+      - name: Verify .gitconfig applied
+        run: |
+          su - testuser -c 'test -s ~/.gitconfig'
+          echo "OK: .gitconfig applied"
+
+      - name: Verify .zshrc applied (regression guard for --keep-going)
+        run: |
+          su - testuser -c 'test -s ~/.zshrc'
+          echo "OK: .zshrc applied"
+
+      - name: Verify no hardcoded home paths in PATH (regression guard for c234acb)
+        run: |
+          su - testuser -c 'grep -q "\$HOME/.kimi-code/bin" ~/.zshrc'
+          echo "OK: PATH uses \$HOME, not a hardcoded username"
+
+      - name: Verify SSH decrypt fails safely (expected, not a crash)
+        run: |
+          if su - testuser -c 'test -f ~/.ssh/id_ed25519'; then
+            echo "FAIL: id_ed25519 decrypted without a key present - key.txt leaked?"
+            exit 1
+          fi
+          echo "OK: SSH key correctly not decrypted without age key"
