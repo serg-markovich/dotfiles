@@ -32,3 +32,17 @@ xargs -n1 code --install-extension < vscode-extensions.txt
 - [ ] Encrypt SSH config with age
 - [ ] Export and track apt/snap package manifest
 - [ ] Verify full reproducibility in a clean Docker container
+## Setting up SSH on a new machine
+
+Bootstrap uses `--keep-going`, so a missing `age` decryption key won't
+block the rest of your dotfiles — but the SSH private key itself won't
+decrypt until you provide it:
+
+1. Copy your `age` identity to `~/.config/chezmoi/key.txt`
+   (secure channel only — password manager, USB, never git/email).
+2. Re-run `chezmoi apply` to pick up the SSH key.
+
+## Known limitations
+
+- `PATH` entries under `$HOME` must never hardcode a username
+  (see commit c234acb) — dotfiles must work under any account.
