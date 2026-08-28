@@ -1,0 +1,13 @@
+repos:
+  - repo: local
+    hooks:
+      - id: no-hardcoded-home-paths
+        name: Check for hardcoded home paths in dotfiles
+        entry: scripts/check-hardcoded-paths.sh
+        language: script
+        files: ^(dot_|private_dot_).*
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
