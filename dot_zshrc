@@ -38,4 +38,4 @@ export ANTHROPIC_API_KEY=""   # must stay empty
 export ANTHROPIC_MODEL="moonshotai/kimi-k2.7-code"
 
 export PATH="$HOME/.local/bin:$PATH"
-export PATH="/home/sergey/.kimi-code/bin:$PATH"
+export PATH="$HOME/.kimi-code/bin:$PATH"
