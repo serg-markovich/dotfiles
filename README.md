@@ -21,17 +21,6 @@ This installs chezmoi, clones this repo, and applies every tracked config file t
 
 Sensitive files (SSH keys, tokens) are encrypted with [age](https://github.com/FiloSottile/age) via `chezmoi add --encrypt` before being committed — plaintext secrets never touch this repository.
 
-## Restore VS Code extensions on a new machine
-
-```bash
-xargs -n1 code --install-extension < vscode-extensions.txt
-```
-
-## Roadmap
-
-- [ ] Encrypt SSH config with age
-- [ ] Export and track apt/snap package manifest
-- [ ] Verify full reproducibility in a clean Docker container
 ## Setting up SSH on a new machine
 
 Bootstrap uses `--keep-going`, so a missing `age` decryption key won't
@@ -42,7 +31,52 @@ decrypt until you provide it:
    (secure channel only — password manager, USB, never git/email).
 2. Re-run `chezmoi apply` to pick up the SSH key.
 
-## Known limitations
+## Restore VS Code extensions on a new machine
 
-- `PATH` entries under `$HOME` must never hardcode a username
-  (see commit c234acb) — dotfiles must work under any account.
+```bash
+xargs -n1 code --install-extension < vscode-extensions.txt
+```
+
+## Troubleshooting
+
+### `chezmoi apply` fails on `.ssh/id_ed25519`
+
+Expected behavior, not a bug. The SSH private key is age-encrypted, and
+decryption needs `~/.config/chezmoi/key.txt`. Without that file, chezmoi
+reports a decryption error for `.ssh/id_ed25519`.
+
+Fix: follow [Setting up SSH on a new machine](#setting-up-ssh-on-a-new-machine),
+then re-run `chezmoi apply`.
+
+### One undecryptable file blocked all other dotfiles
+
+Previously, a single file that could not be decrypted aborted the whole
+bootstrap, so every file after it was skipped. This was fixed in
+[`f5692e1`](https://github.com/serg-markovich/dotfiles/commit/f5692e1): `install.sh` now runs
+`chezmoi init --apply --keep-going`.
+
+Do not remove `--keep-going` as "redundant". Without it, a missing age key
+leaves the machine with only a partial set of dotfiles.
+
+## Conventions
+
+Rules for anyone editing `dot_*` files, including future me:
+
+- **No hardcoded paths under `$HOME`.** Never write a username into a path
+  (for example `/home/<user>/...`); use `$HOME` instead. Dotfiles must work
+  under any account. A hardcoded `PATH` entry broke portability and was fixed in
+  [`c234acb`](https://github.com/serg-markovich/dotfiles/commit/c234acb).
+- **Keep `--keep-going` in `install.sh`.** See Troubleshooting above.
+- **Never commit plaintext secrets.** Add them with `chezmoi add --encrypt`.
+
+## Secrets rotation
+
+The procedure for the `age` key (where the backup lives, how to rotate it,
+what to do if it is compromised) is tracked in
+[#10](https://github.com/serg-markovich/dotfiles/issues/10) and is not yet documented.
+
+## Roadmap
+
+- [ ] Encrypt SSH config with age
+- [ ] Export and track apt/snap package manifest
+- [ ] Verify full reproducibility in a clean Docker container
